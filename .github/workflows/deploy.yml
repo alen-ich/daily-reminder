@@ -22,7 +22,7 @@ jobs:
           script: |
             cd ${{ secrets.VPS_PROJECT_PATH }}
             git pull origin main
-            npm install --production
+            npm install
             npm run build
             pm2 restart daily-remind-bot || pm2 start ecosystem.config.js
             pm2 save
