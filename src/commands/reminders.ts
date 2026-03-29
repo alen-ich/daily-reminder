@@ -9,6 +9,7 @@ import {
   getUserSettings,
   setSleepHours,
   clearSleepHours,
+  setTimezone,
   type Reminder,
 } from "../database";
 
@@ -120,6 +121,8 @@ export function registerReminderCommands(bot: Bot): void {
 
   bot.command("myreminders", (ctx) => {
     const reminders = getRemindersByChatId(ctx.chat.id);
+    const settings = getUserSettings(ctx.chat.id);
+    const timezone = settings?.timezone || "UTC";
 
     if (reminders.length === 0) {
       ctx.reply("You have no reminders. Create one with /remind");
@@ -131,7 +134,7 @@ export function registerReminderCommands(bot: Bot): void {
       const schedule = r.type === "interval"
         ? `${r.interval_minutes} min`
         : `daily at ${r.time_of_day}`;
-      const nextDate = new Date(r.next_trigger).toLocaleDateString('en-GB');
+      const nextDate = new Date(r.next_trigger).toLocaleString('en-GB', { timeZone: timezone });
       return `${status} ${r.id}: "${r.message}" (${schedule})\n   Next: ${nextDate}`;
     });
 
@@ -208,5 +211,26 @@ export function registerReminderCommands(bot: Bot): void {
 
     setSleepHours(ctx.chat.id, sleepStart, sleepEnd);
     ctx.reply(`😴 Sleep mode set!\n\nNo reminders from ${sleepStart} to ${sleepEnd}.\n\nUse /sleepmode off to disable.`);
+  });
+
+  bot.command("timezone", (ctx) => {
+    const args = ctx.match?.trim();
+
+    if (!args) {
+      const settings = getUserSettings(ctx.chat.id);
+      const currentTz = settings?.timezone || "UTC";
+      ctx.reply(`🌍 Your current timezone: ${currentTz}\n\nTo change: /timezone Europe/Kiev`);
+      return;
+    }
+
+    try {
+      Intl.DateTimeFormat(undefined, { timeZone: args });
+    } catch {
+      ctx.reply("Invalid timezone. Example: /timezone Europe/Kiev\n\nList: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones");
+      return;
+    }
+
+    setTimezone(ctx.chat.id, args);
+    ctx.reply(`🌍 Timezone set to: ${args}\n\nDates will now be shown in your local time.`);
   });
 }

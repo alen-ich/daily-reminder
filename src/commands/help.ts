@@ -10,7 +10,8 @@ export function registerHelpCommand(bot: Bot) {
       "/myreminders - List your reminders\n" +
       "/delreminder <id> - Delete a reminder\n" +
       "/togglereminder <id> - Enable/disable reminder\n" +
-      "/sleepmode - Set quiet hours (22:00-07:00)"
+      "/sleepmode - Set quiet hours (22:00-07:00)\n" +
+      "/timezone - Set your timezone"
     );
   });
 }

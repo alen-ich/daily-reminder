@@ -30,7 +30,8 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS user_settings (
     chat_id INTEGER PRIMARY KEY,
     sleep_start TEXT,
-    sleep_end TEXT
+    sleep_end TEXT,
+    timezone TEXT DEFAULT 'UTC'
   )
 `);
 
@@ -101,6 +102,7 @@ export interface UserSettings {
   chat_id: number;
   sleep_start: string | null;
   sleep_end: string | null;
+  timezone: string;
 }
 
 export function getUserSettings(chatId: number): UserSettings | undefined {
@@ -109,11 +111,24 @@ export function getUserSettings(chatId: number): UserSettings | undefined {
 }
 
 export function setSleepHours(chatId: number, sleepStart: string, sleepEnd: string): void {
+  const existing = getUserSettings(chatId);
+  const timezone = existing?.timezone || "UTC";
   const stmt = db.prepare(`
-    INSERT OR REPLACE INTO user_settings (chat_id, sleep_start, sleep_end)
-    VALUES (?, ?, ?)
+    INSERT OR REPLACE INTO user_settings (chat_id, sleep_start, sleep_end, timezone)
+    VALUES (?, ?, ?, ?)
   `);
-  stmt.run(chatId, sleepStart, sleepEnd);
+  stmt.run(chatId, sleepStart, sleepEnd, timezone);
+}
+
+export function setTimezone(chatId: number, timezone: string): void {
+  const existing = getUserSettings(chatId);
+  const sleepStart = existing?.sleep_start || null;
+  const sleepEnd = existing?.sleep_end || null;
+  const stmt = db.prepare(`
+    INSERT OR REPLACE INTO user_settings (chat_id, sleep_start, sleep_end, timezone)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(chatId, sleepStart, sleepEnd, timezone);
 }
 
 export function clearSleepHours(chatId: number): void {
