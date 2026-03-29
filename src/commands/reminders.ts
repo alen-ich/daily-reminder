@@ -131,7 +131,7 @@ export function registerReminderCommands(bot: Bot): void {
       const schedule = r.type === "interval"
         ? `${r.interval_minutes} min`
         : `daily at ${r.time_of_day}`;
-      const nextDate = new Date(r.next_trigger).toLocaleString();
+      const nextDate = new Date(r.next_trigger).toLocaleDateString('en-GB');
       return `${status} ${r.id}: "${r.message}" (${schedule})\n   Next: ${nextDate}`;
     });
 
