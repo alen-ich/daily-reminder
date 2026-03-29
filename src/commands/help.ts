@@ -6,7 +6,6 @@ export function registerHelpCommand(bot: Bot) {
       "📖 Available commands:\n" +
       "/start - Welcome message\n" +
       "/help - Show this help menu\n" +
-      "/water_reminder - Toggle hourly water reminders\n" +
       "/remind - Create custom reminder\n" +
       "/myreminders - List your reminders\n" +
       "/delreminder <id> - Delete a reminder\n" +
